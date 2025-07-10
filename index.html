@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ytosko's Groove - AI Music Playlists</title>
+    
+    <meta name="description" content="Ytosko's Groove: Your personal AI DJ. Describe any mood, genre, or vibe, and let our AI generate the perfect custom playlist and album art for you. Discover and create music like never before.">
+    <meta name="keywords" content="AI music, playlist generator, custom playlist, music discovery, AI DJ, Ytosko's Groove, Gemini API, music streaming">
+    <meta name="author" content="Ytosko's Groove">
+
+    <meta name="author" content="Saiki Sarkar, Ytosko's Groove">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://ytoskos-groove.com/">
+    <meta property="og:title" content="Ytosko's Groove - AI Music Playlists">
+    <meta property="og:description" content="Describe any mood, genre, or vibe, and let our AI generate the perfect custom playlist for you.">
+    <meta property="og:image" content="https://storage.googleapis.com/proudcity/mebanenc/uploads/2021/03/music-notes.jpg">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://ytoskos-groove.com/">
+    <meta property="twitter:title" content="Ytosko's Groove - AI Music Playlists">
+    <meta property="twitter:description" content="Describe any mood, genre, or vibe, and let our AI generate the perfect custom playlist for you.">
+    <meta property="twitter:image" content="https://storage.googleapis.com/proudcity/mebanenc/uploads/2021/03/music-notes.jpg">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎵</text></svg>">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <style>
+      :root {
+        --font-primary: 'Lexend', sans-serif;
+        --font-secondary: 'Inter', sans-serif;
+
+        --radius-sm: 0.25rem; /* 4px */
+        --radius-md: 0.5rem;  /* 8px */
+        --radius-lg: 0.75rem; /* 12px */
+        --radius-full: 9999px;
+
+        --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
+        --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1);
+        --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1);
+        
+        --transition-fast: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        --transition-medium: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      body {
+        font-family: var(--font-secondary);
+        scroll-behavior: smooth;
+        background-color: var(--color-bg-primary);
+        color: var(--color-text-primary);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+        --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--color-accent-500);
+        --tw-shadow: 0 0 #0000;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        width: 100vw; height: 100vh;
+        background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAMAAAAp4XiDAAAAUVBMVEWFhYWDg4N3d3dtbW17e3t1dXWBgYGHh4d5eXlzc3OLi4ubm5uVlZWYmJitbW1xcXFYWFhZWVldXV2KioqJiYmSkpKSkpPLy8uBgYGCgoM8O8v3AAAAAnRSTlMAgJsrThgAAAAWSURBVEiI7cEBDQAAAMKg9U9tCU+SQLaHIAAAAH4YVwAAAABJRU5ErkJggg==');
+        background-repeat: repeat;
+        opacity: 0.02;
+        pointer-events: none;
+        z-index: -1;
+      }
+
+      h1, h2, h3, h4, h5, h6 {
+        font-family: var(--font-primary);
+      }
+      
+      /* --- THEME DEFINITIONS --- */
+      [data-theme="indigo"], [data-theme="amber"] {
+        --color-bg-primary: #111113;
+        --color-bg-secondary: #18181B;
+        --color-bg-tertiary: #27272A;
+        --color-bg-hover: #3f3f46;
+        --color-bg-selected: rgba(255, 255, 255, 0.05);
+        --color-bg-backdrop: rgba(0, 0, 0, 0.5);
+        --color-player-max-bg: rgba(0, 0, 0, 0.5);
+        --color-text-primary: #f4f4f5;
+        --color-text-primary-inverted: #111113;
+        --color-text-secondary: #a1a1aa;
+        --color-text-tertiary: #71717a;
+        --color-border-primary: #27272a;
+        --color-border-secondary: #3f3f46;
+        --color-play-button-bg: #ffffff;
+        --color-play-button-text: #000000;
+      }
+
+      [data-theme="crimson"], [data-theme="emerald"] {
+        --color-bg-secondary: #ffffff;
+        --color-bg-tertiary: #f4f4f5;
+        --color-bg-hover: #e4e4e7;
+        --color-bg-selected: rgba(0, 0, 0, 0.04);
+        --color-bg-backdrop: rgba(255, 255, 255, 0.1);
+        --color-player-max-bg: rgba(255, 255, 255, 0.5);
+        --color-text-primary: #18181b;
+        --color-text-primary-inverted: #ffffff;
+        --color-text-secondary: #52525b;
+        --color-text-tertiary: #a1a1aa;
+        --color-border-primary: #e4e4e7;
+        --color-border-secondary: #d4d4d8;
+        --color-play-button-bg: var(--color-accent-600);
+        --color-play-button-text: #ffffff;
+      }
+
+      [data-theme="indigo"] {
+        --color-accent-600: #4f46e5;
+        --color-accent-500: #6366f1;
+        --color-accent-400: #818cf8;
+        --color-accent-800: #3730a3;
+        --color-accent-950: #1e1b4b;
+      }
+      [data-theme="crimson"] {
+        --color-bg-primary: #fef1f2;
+        --color-accent-600: #e11d48;
+        --color-accent-500: #f43f5e;
+        --color-accent-400: #fb7185;
+        --color-accent-800: #9f1239;
+        --color-accent-950: #fff1f2;
+      }
+      [data-theme="emerald"] {
+        --color-bg-primary: #f0fdf4;
+        --color-accent-600: #059669;
+        --color-accent-500: #10b981;
+        --color-accent-400: #34d399;
+        --color-accent-800: #047857;
+        --color-accent-950: #ecfdf5;
+      }
+      [data-theme="amber"] {
+        --color-accent-600: #d97706;
+        --color-accent-500: #f59e0b;
+        --color-accent-400: #fbbf24;
+        --color-accent-800: #92400e;
+        --color-accent-950: #451a03;
+      }
+
+      ::-webkit-scrollbar { width: 10px; }
+      ::-webkit-scrollbar-track { background: transparent; }
+      ::-webkit-scrollbar-thumb { background: var(--color-bg-tertiary); border-radius: 10px; border: 2px solid var(--color-bg-secondary); }
+      ::-webkit-scrollbar-thumb:hover { background: var(--color-text-tertiary); }
+      
+      @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+      @keyframes slide-up-fade { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+      @keyframes list-item-appear { from { transform: translateX(-10px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+      @keyframes subtle-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+      @keyframes slow-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+      @keyframes slow-pan { 0% { background-position: 0% 0%; } 50% { background-position: 100% 100%; } 100% { background-position: 0% 0%; } }
+
+      .animate-fade-in { animation: fade-in 0.4s var(--transition-medium) forwards; }
+      .animate-slide-up-fade { animation: slide-up-fade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+      .animate-list-item { opacity: 0; animation: list-item-appear 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+      .bg-primary { background-color: var(--color-bg-primary); }
+      .bg-secondary { background-color: var(--color-bg-secondary); }
+      .bg-tertiary { background-color: var(--color-bg-tertiary); }
+      .bg-backdrop { background-color: var(--color-bg-backdrop); }
+      .bg-player-maximized { background-color: var(--color-player-max-bg); }
+      .hover\:bg-hover:hover { background-color: var(--color-bg-hover); }
+      .bg-selected { background-color: var(--color-bg-selected); }
+      
+      .text-primary { color: var(--color-text-primary); }
+      .text-primary-inverted { color: var(--color-text-primary-inverted); }
+      .text-secondary { color: var(--color-text-secondary); }
+      .text-tertiary { color: var(--color-text-tertiary); }
+      .placeholder-secondary::placeholder { color: var(--color-text-secondary); }
+      .text-accent { color: var(--color-accent-500); }
+      .hover\:text-accent:hover { color: var(--color-accent-400); }
+      
+      .border-primary { border-color: var(--color-border-primary); }
+      .border-secondary { border-color: var(--color-border-secondary); }
+      .border-accent { border-color: var(--color-accent-400); }
+      .hover\:border-accent:hover { border-color: var(--color-accent-400); }
+
+      .bg-play-button { background-color: var(--color-play-button-bg); }
+      .text-play-button { color: var(--color-play-button-text); }
+      
+      .bg-accent { background-color: var(--color-accent-600); }
+      .hover\:bg-accent-hover:hover { background-color: var(--color-accent-500); }
+      .accent-color { accent-color: var(--color-accent-500); }
+      .disabled\:bg-accent-disabled:disabled { background-color: var(--color-accent-800); opacity: 0.5; }
+      .bg-accent-selected-bg { background-color: var(--color-accent-950); }
+      
+      .ring-accent { box-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--color-accent-500); }
+      .focus\:ring-accent:focus { box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow); outline: 2px solid transparent; outline-offset: 2px; }
+
+      /* Custom Utilities */
+      .transition-all-fast { transition: var(--transition-fast); }
+      .transition-all-medium { transition: var(--transition-medium); }
+      .active\:scale-95:active { transform: scale(0.95); }
+      .rounded-sm { border-radius: var(--radius-sm); }
+      .rounded-md { border-radius: var(--radius-md); }
+      .rounded-lg { border-radius: var(--radius-lg); }
+      .rounded-full { border-radius: var(--radius-full); }
+      .shadow-md { box-shadow: var(--shadow-md); }
+      .shadow-lg { box-shadow: var(--shadow-lg); }
+      .shadow-xl { box-shadow: var(--shadow-xl); }
+
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react/": "https://esm.sh/react@^19.1.0/",
+    "react": "https://esm.sh/react@^19.1.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.1.0/",
+    "@google/genai": "https://esm.sh/@google/genai@^1.8.0",
+    "idb": "https://esm.sh/idb@^8.0.0"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body class="antialiased">
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>
