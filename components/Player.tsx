@@ -85,29 +85,23 @@ export const Player: React.FC<PlayerProps> = ({
 
 
   useEffect(() => {
+    let retryTimeout: NodeJS.Timeout;
+
     const initializePlayer = () => {
-      if (window.YT && !playerRef.current) {
+      // Double-check if YT.Player is available
+      if (window.YT && window.YT.Player && !playerRef.current) {
         playerRef.current = new window.YT.Player('youtube-player', {
           height: '0',
           width: '0',
           playerVars: { controls: 0, playsinline: 1, fs: 0, modestbranding: 1 },
           events: {
-            onReady: (event: any) => {
-              setIsPlayerReady(true);
-            },
+            onReady: (event: any) => setIsPlayerReady(true),
             onStateChange: (event: any) => {
               const playerState = event.data;
-              const player = playerRef.current;
-
-              // When a new video is cued, play it if the app's intent is to play.
-              if (playerState === window.YT.PlayerState.CUED && isPlayingRef.current) {
-                  player?.playVideo();
-              }
-
               if (playerState === window.YT.PlayerState.ENDED) {
-                if (repeatModeRef.current === 'one' && player) {
-                  player.seekTo(0, true);
-                  player.playVideo();
+                if (repeatModeRef.current === 'one' && playerRef.current) {
+                  playerRef.current.seekTo(0, true);
+                  playerRef.current.playVideo();
                 } else {
                   onEndedRef.current();
                 }
@@ -122,14 +116,26 @@ export const Player: React.FC<PlayerProps> = ({
             },
           },
         });
+      } else if (window.YT && !window.YT.Player) {
+        // If YT exists but YT.Player isn't ready, retry after a short delay
+        retryTimeout = setTimeout(initializePlayer, 100);
       }
     };
-    
+
+    // If YT isn't loaded at all, rely on `onYouTubeIframeAPIReady`
     if (!window.YT) {
       window.onYouTubeIframeAPIReady = initializePlayer;
     } else {
-      initializePlayer();
+      initializePlayer(); // Try immediately
     }
+
+    // Cleanup on unmount
+    return () => {
+      if (retryTimeout) clearTimeout(retryTimeout);
+      if (window.onYouTubeIframeAPIReady === initializePlayer) {
+        window.onYouTubeIframeAPIReady = null; // Prevent memory leaks
+      }
+    };
   }, []);
   
   // Reset timer when song changes
